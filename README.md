@@ -1,8 +1,11 @@
 # maxmind-lookup
 
+## WORK IN PROGRESS
+
+
 Originaly inspired by <https://github.com/O-X-L/geoip-lookup-service>
 
-This is a minimalistic version to just return country in order to do GEOIP blocking in Haproxy.
+This is a minimalistic version with only country in order to do GEOIP blocking in Haproxy.
 
 Using test database:
 
