@@ -11,5 +11,3 @@ wget https://raw.githubusercontent.com/maxmind/MaxMind-DB/refs/heads/main/test-d
 go run main.go --mmdb ./test/GeoIP2-Country-Test.mmdb
 curl "http://127.0.0.1:10000/81.2.69.192"
 ```
-
-
