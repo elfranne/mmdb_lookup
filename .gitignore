@@ -27,6 +27,6 @@ go.work.sum
 # env file
 .env
 
-maxmind-lookup
+maxmind_lookup
 
 test/*

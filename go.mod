@@ -1,4 +1,4 @@
-module maxmind-lookup
+module maxmind_lookup
 
 go 1.24.3
 

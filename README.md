@@ -1,4 +1,4 @@
-# maxmind-lookup
+# maxmind_lookup
 
 ## WORK IN PROGRESS
 
