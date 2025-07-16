@@ -45,7 +45,7 @@ func main() {
 	var mmdb string
 
 	flag.StringVar(&listen, "l", "127.0.0.1:10000", "Address and port to listen on (default: 127.0.0.1:10000)")
-	flag.StringVar(&mmdb, "mmdb", "/var/lib/GeoIP/GeoLite2-City.mmdb", "Path to the Maxmind database (default: \"/var/lib/GeoIP/GeoLite2-City.mmdb\")")
+	flag.StringVar(&mmdb, "mmdb", "./mmdb-country.mmdb", "Path to the mmdb (default: \"./mmdb-country.mmdb\")")
 	flag.Parse()
 
 	http.HandleFunc("/", mmdbLookup)

@@ -28,5 +28,5 @@ go.work.sum
 .env
 
 mmdb_lookup
-
-test/*
+mmdb-asn.mmdb
+mmdb-country.mmdb
