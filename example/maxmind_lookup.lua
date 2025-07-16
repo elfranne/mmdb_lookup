@@ -1,4 +1,4 @@
--- Source: https://github.com/elfranne/maxmind_lookup
+-- Source: https://github.com/elfranne/mmdb_lookup
 -- Copyright (C) 2025 Elfranne
 -- License: MIT
 
@@ -11,8 +11,8 @@ local function http_request(src)
 
 end
 
-local function maxmind_lookup(txn)
+local function mmdb_lookup(txn)
   txn:set_var('txn.geoip_country', http_request(txn.f:src()))
 end
 
-core.register_action('maxmind_lookup', { 'tcp-req', 'http-req' }, maxmind_lookup, 0)
+core.register_action('mmdb_lookup', { 'tcp-req', 'http-req' }, mmdb_lookup, 0)

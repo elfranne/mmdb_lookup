@@ -11,7 +11,7 @@ import (
 	"github.com/oschwald/geoip2-golang/v2"
 )
 
-func MaxmindLookup(w http.ResponseWriter, r *http.Request) {
+func mmdbLookup(w http.ResponseWriter, r *http.Request) {
 	ipStr := strings.TrimPrefix(r.URL.Path, "/")
 
 	dbOpen, err := geoip2.Open(flag.Lookup("mmdb").Value.(flag.Getter).Get().(string))
@@ -48,7 +48,7 @@ func main() {
 	flag.StringVar(&mmdb, "mmdb", "/var/lib/GeoIP/GeoLite2-City.mmdb", "Path to the Maxmind database (default: \"/var/lib/GeoIP/GeoLite2-City.mmdb\")")
 	flag.Parse()
 
-	http.HandleFunc("/", MaxmindLookup)
+	http.HandleFunc("/", mmdbLookup)
 	fmt.Println("Listening on http://" + listen)
 	log.Fatal(http.ListenAndServe(listen, nil))
 }
