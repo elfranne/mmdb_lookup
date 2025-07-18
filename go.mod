@@ -2,8 +2,7 @@ module mmdb_lookup
 
 go 1.24.3
 
-require github.com/oschwald/geoip2-golang/v2 v2.0.0-beta.3
-replace github.com/oschwald/geoip2-golang/v2 => /home/tom/github.com/geoip2-golang
+require github.com/elfranne/geoip2-golang/v2 v2.0.0-20250717075950-623724b51d4a
 
 require (
 	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.7 // indirect

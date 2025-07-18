@@ -1,5 +1,7 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/elfranne/geoip2-golang/v2 v2.0.0-20250717075950-623724b51d4a h1:mtnAVcRcx90VJZJsZ9en9f1+FQQibGnO1ph75tGo2l0=
+github.com/elfranne/geoip2-golang/v2 v2.0.0-20250717075950-623724b51d4a/go.mod h1:tBM3/M0webj0aGkwSjINZPT95tq/ZnpRbvtg3IcEAm4=
 github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.7 h1:8ivtp2oRTsp7hTpkMgS5kLDvXC2SQoC2JuLph13ZXp8=
 github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.7/go.mod h1:A1wLWQkiHqLUux3/cnHBBKxjYW4s7TZQnQ55fLa37NA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
