@@ -16,49 +16,42 @@ import (
 func route(dbOpen *geoip2.Reader) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := strings.TrimPrefix(r.URL.Path, "/")
-
-		if ip, err := netip.ParseAddr(data); err != nil {
-			mmdbLookup(dbOpen, &ip)
+		if ip, err := netip.ParseAddr(data); err == nil {
+			mmdbLookup(dbOpen, &ip)(w, r)
+			return
 		}
 
-		if value, err := strconv.ParseUint(data, 10, 64); err == nil {
-			fmt.Fprintf("%q is a valid uint64 value: %d", data, value)
-			return 
+		if b36, err := strconv.ParseUint(data, 10, 64); err == nil {
+			fmt.Fprintf(w, "%v\n", base36.Encode(b36))
+			return
 		}
-		fmt.Fprintf(w, "%s\n", data)
-		return 
+		log.Printf("err(1): failed to parse: %s\n", data)
+		http.Error(w, "1\n", http.StatusServiceUnavailable)
 
 	}
 }
 
 func mmdbLookup(dbOpen *geoip2.Reader, ip *netip.Addr) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		record, err := dbOpen.City(*ip)
 		if err != nil {
-			http.Error(w, "01", http.StatusServiceUnavailable)
-			fmt.Println(ip.String() + ": " + err.Error())
+			log.Printf("err(2) %s: %s\n", ip.String(), err.Error())
+			http.Error(w, "2\n", http.StatusNotFound)
+			return
+		}
+
+		if ip.IsPrivate() || ip.IsLoopback(){
+			fmt.Fprintf(w, "%v\n", base36.Decode("1918")) // RFC1918
 			return
 		}
 
 		if !record.HasData() {
-			http.Error(w, "03", http.StatusNotFound)
-			fmt.Println(ip.String() + ": no data found")
+			log.Printf("err(3) No data found for IP %s\n", ip.String())
+			http.Error(w, "3\n", http.StatusNotFound)
 			return
 		}
 		fmt.Fprintf(w, "%v\n", base36.Decode(record.Country.ISOCode))
 	}
-}
-
-func decode(w http.ResponseWriter, r *http.Request) {
-	decoded, err := strconv.ParseUint(strings.TrimPrefix(r.URL.Path, "/decode/"), 10, 64)
-	if err != nil {
-		http.Error(w, "06", http.StatusServiceUnavailable)
-		fmt.Println(r.URL.Path + " failed : " + err.Error())
-		return
-	}
-	fmt.Fprintf(w, "%v\n", base36.Encode(decoded))
-
 }
 
 func main() {
@@ -71,12 +64,12 @@ func main() {
 
 	dbOpen, err := geoip2.Open(mmdb)
 	if err != nil {
-		log.Println(err.Error())
+		log.Fatalf("Error opening MMDB: %s\n", err.Error())
 		return
 	}
 	defer dbOpen.Close()
 
 	http.HandleFunc("/", route(dbOpen))
-	fmt.Println("Listening on http://" + listen)
+	log.Printf("Listening on http://%s\n", listen)
 	log.Fatal(http.ListenAndServe(listen, nil))
 }
