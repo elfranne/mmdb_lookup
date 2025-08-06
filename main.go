@@ -6,42 +6,30 @@ import (
 	"log"
 	"net/http"
 	"net/netip"
-	"strconv"
 	"strings"
 
 	"github.com/elfranne/geoip2-golang/v2"
-	"github.com/martinlindhe/base36"
 )
 
-func route(dbOpen *geoip2.Reader) http.HandlerFunc {
+func mmdbLookup(dbOpen *geoip2.Reader) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := strings.TrimPrefix(r.URL.Path, "/")
-		if ip, err := netip.ParseAddr(data); err == nil {
-			mmdbLookup(dbOpen, &ip)(w, r)
+		ip, err := netip.ParseAddr(data)
+		if err != nil {
+			log.Printf("err(1): failed to parse: %s\n", data)
+			http.Error(w, "1\n", http.StatusServiceUnavailable)
 			return
 		}
 
-		if b36, err := strconv.ParseUint(data, 10, 64); err == nil {
-			fmt.Fprintf(w, "%v\n", base36.Encode(b36))
-			return
-		}
-		log.Printf("err(1): failed to parse: %s\n", data)
-		http.Error(w, "1\n", http.StatusServiceUnavailable)
-
-	}
-}
-
-func mmdbLookup(dbOpen *geoip2.Reader, ip *netip.Addr) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		record, err := dbOpen.City(*ip)
+		record, err := dbOpen.City(ip)
 		if err != nil {
 			log.Printf("err(2) %s: %s\n", ip.String(), err.Error())
 			http.Error(w, "2\n", http.StatusNotFound)
 			return
 		}
 
-		if ip.IsPrivate() || ip.IsLoopback(){
-			fmt.Fprintf(w, "%v\n", base36.Decode("1918")) // RFC1918
+		if ip.IsPrivate() || ip.IsLoopback() {
+			fmt.Fprintf(w, "%v\n", "RFC1918")
 			return
 		}
 
@@ -50,7 +38,7 @@ func mmdbLookup(dbOpen *geoip2.Reader, ip *netip.Addr) http.HandlerFunc {
 			http.Error(w, "3\n", http.StatusNotFound)
 			return
 		}
-		fmt.Fprintf(w, "%v\n", base36.Decode(record.Country.ISOCode))
+		fmt.Fprintf(w, "%v\n", record.Country.ISOCode)
 	}
 }
 
@@ -69,7 +57,7 @@ func main() {
 	}
 	defer dbOpen.Close()
 
-	http.HandleFunc("/", route(dbOpen))
+	http.HandleFunc("/", mmdbLookup(dbOpen))
 	log.Printf("Listening on http://%s\n", listen)
 	log.Fatal(http.ListenAndServe(listen, nil))
 }
