@@ -29,7 +29,6 @@ func mmdbLookup(dbOpen *geoip2.Reader) http.HandlerFunc {
 		}
 
 		if ip.IsPrivate() || ip.IsLoopback() {
-			fmt.Fprintf(w, "%v", "RFC1918")
 			if _, err := fmt.Fprintf(w, "%v", "RFC1918"); err != nil {
 				http.Error(w, "Unable to write response", http.StatusInternalServerError)
 			}
