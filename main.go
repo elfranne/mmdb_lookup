@@ -17,28 +17,33 @@ func mmdbLookup(dbOpen *geoip2.Reader) http.HandlerFunc {
 		ip, err := netip.ParseAddr(data)
 		if err != nil {
 			log.Printf("err(1): failed to parse: %s\n", data)
-			http.Error(w, "1\n", http.StatusServiceUnavailable)
+			http.Error(w, "1", http.StatusServiceUnavailable)
 			return
 		}
 
 		record, err := dbOpen.City(ip)
 		if err != nil {
 			log.Printf("err(2) %s: %s\n", ip.String(), err.Error())
-			http.Error(w, "2\n", http.StatusNotFound)
+			http.Error(w, "2", http.StatusNotFound)
 			return
 		}
 
 		if ip.IsPrivate() || ip.IsLoopback() {
-			fmt.Fprintf(w, "%v\n", "RFC1918")
+			fmt.Fprintf(w, "%v", "RFC1918")
+			if _, err := fmt.Fprintf(w, "%v", "RFC1918"); err != nil {
+				http.Error(w, "Unable to write response", http.StatusInternalServerError)
+			}
 			return
 		}
 
 		if !record.HasData() {
 			log.Printf("err(3) No data found for IP %s\n", ip.String())
-			http.Error(w, "3\n", http.StatusNotFound)
+			http.Error(w, "3", http.StatusNotFound)
 			return
 		}
-		fmt.Fprintf(w, "%v\n", record.Country.ISOCode)
+		if _, err := fmt.Fprintf(w, "%v", record.Country.ISOCode); err != nil {
+			http.Error(w, "Unable to write response", http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -55,7 +60,9 @@ func main() {
 		log.Fatalf("Error opening MMDB: %s\n", err.Error())
 		return
 	}
-	defer dbOpen.Close()
+	defer func() {
+		_ = dbOpen.Close()
+	}()
 
 	http.HandleFunc("/", mmdbLookup(dbOpen))
 	log.Printf("Listening on http://%s\n", listen)
